@@ -1,6 +1,5 @@
-# Discord Activity: Getting Started Guide
+BAKUHATSU GAME
 
-This template is used in the [Building An Activity](https://discord.com/developers/docs/activities/building-an-activity) tutorial in the Discord Developer Docs.
+![logo](https://github.com/user-attachments/assets/6f95a4c0-eec7-4949-b416-22e53d115978)
 
-Read more about building Discord Activities with the Embedded App SDK at [https://discord.com/developers/docs/activities/overview](https://discord.com/developers/docs/activities/overview).
-
+![banner](https://github.com/user-attachments/assets/0796dd8e-b765-4314-883b-0110ff59817e)
