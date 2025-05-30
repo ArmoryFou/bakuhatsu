@@ -12,6 +12,7 @@
     "vite": "^5.0.8"
   },
   "dependencies": {
-    "@discord/embedded-app-sdk": "^2.0.0"
+    "@discord/embedded-app-sdk": "^2.0.0",
+    "wanakana": "^5.3.1"
   }
 }

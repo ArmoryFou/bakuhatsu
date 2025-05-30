@@ -1,7 +1,10 @@
 import './bomb.js';
+import { players, mainPlayerIndex, setMainPlayerIndex, setWord, currentAnswer, compareAnswer, setcurrentAnswer } from "./gameState.js";
+import { renderPlayers } from "./player.js";
+import * as wanakana from 'wanakana';
 
 // Simple control panel with input and button
-
+const controlPanel = document.querySelector('#controlPanel');
 const panel = document.createElement('div');
 panel.style.position = 'fixed';
 panel.style.top = '50%';
@@ -39,21 +42,32 @@ button.style.cursor = 'pointer';
 
 panel.appendChild(input);
 panel.appendChild(button);
-document.body.appendChild(panel);
-
-let mainPlayerIndex = 0;
-const totalPlayers = 3;
-
-// Import the renderPlayers function from player.js
-import { renderPlayers } from './player.js';
-
-// Initial render (no animation)
-renderPlayers(totalPlayers, mainPlayerIndex, false);
+controlPanel.appendChild(panel);
 
 button.addEventListener('click', () => {
-  mainPlayerIndex = (mainPlayerIndex + 1) % totalPlayers;
-  renderPlayers(totalPlayers, mainPlayerIndex, true); // animate on turn
+    let answer = input.value.trim();
+    if(!wanakana.isJapanese(answer)) {
+        answer = wanakana.toHiragana(answer);
+    }
+    setcurrentAnswer(answer);
+    if (compareAnswer()) {
+        setWord();
+  let newIndex = mainPlayerIndex;
+  let found = false;
+  for (let i = 1; i <= players.length; i++) {
+    const idx = (mainPlayerIndex + i) % players.length;
+    if (players[idx].lives > 0) {
+      newIndex = idx;
+      found = true;
+      break;
+    }
+  }
+  if (found) {
+    setMainPlayerIndex(newIndex);
+    renderPlayers(players, newIndex, true);
+  }
   input.value = '';
+    }
 });
 
 input.addEventListener('input', () => {

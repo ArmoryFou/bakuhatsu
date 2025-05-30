@@ -1,4 +1,5 @@
 import "../style.css";
+import { players, mainPlayerIndex, loseLife, setWord } from "./gameState.js";
 
 import bomb1 from '../media/bomb/bomb1.webm';
 import bomb1after from '../media/bomb/bomb1after.mp4';
@@ -22,7 +23,7 @@ document.querySelector('#bomb').innerHTML = `
       <video muted playsinline id="bombVideo3" style="display: none;">
         <source src="${bombend}" type="video/webm">
       </video>
-      <div id="question">間に合う</div>
+      <div id="question"></div>
     </div>
     <div id="response"></div>
   </div>
@@ -37,41 +38,59 @@ video3.load();
 
 // set timer state
 let timerStarted = false;
+let bombTimeout = null;
+
 
 // set time limit for the bomb
 let limitTime = 10 // seconds;
 
-// start third video after timer ends
-video1.addEventListener('play', () => {
-  if (!timerStarted) {
-    timerStarted = true;
+setWord(); // Initialize the word and answers
 
-    setTimeout(() => {
-      video3.style.display = 'block';
-      video3.play();
-      video2.style.display = 'none'; // hide looping video
-      question.style.display = 'none'; // hide question
-      response.style.display = 'none'; // show response
-    }, limitTime * 1000);
-  }
+function startBombSequence() {
+  // Reset UI
+  video1.style.display = 'block';
+  video1.currentTime = 0;
+  video2.style.display = 'none';
+  video2.currentTime = 0;
+  video3.style.display = 'none';
+  video3.currentTime = 0;
+  question.style.display = 'block';
+  response.style.display = 'block';
+  timerStarted = false;
+
+  // Play the start video (not looped)
+  video1.play();
+}
+
+// When the start video ends, switch to the looping video
+video1.addEventListener('ended', () => {
+  video1.style.display = 'none';
+  video2.style.display = 'block';
+  video2.currentTime = 0;
+  video2.play();
+
+  // Start the timer here, not in video2's play event
+  timerStarted = true;
+  bombTimeout = setTimeout(() => {
+    // Timer ends: show explosion
+    video2.style.display = 'none';
+    video2.pause();
+    video3.style.display = 'block';
+    video3.currentTime = 0;
+    video3.play();
+    question.style.display = 'none';
+    response.style.display = 'none';
+    loseLife();
+  }, limitTime * 1000);
 });
 
+// When the explosion ends, reset for next round
 video3.addEventListener('ended', () => {
-  video3.style.display = 'none'; // hide explosion video
+  video3.style.display = 'none';
+  timerStarted = false;
+  clearTimeout(bombTimeout);
+  setTimeout(startBombSequence, 1000);
 });
 
-// start second video when first video ends
-video1.addEventListener('timeupdate', () => {
-  const remaining = video1.duration - video1.currentTime;
-
-  if (remaining <= 0.1 && video2.paused) {
-    video2.style.display = 'block';
-    video2.currentTime = 0;
-    video2.loop = true;
-    video2.play();
-  }
-// hide the first video when the timer is almost over
-  if (remaining <= 0.01) {
-    video1.style.display = 'none';
-  }
-});
+// Initial start
+startBombSequence();
